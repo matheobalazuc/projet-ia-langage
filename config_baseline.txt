@@ -1,0 +1,32 @@
+CONFIG 0 - BASELINE
+
+PARAMETRES
+----------
+d_model             = 512
+nhead               = 8
+num_encoder_layers  = 6
+num_decoder_layers  = 6
+dim_feedforward     = 1024
+n_epoch             = 10
+learning_rate       = 1e-4
+batch_size          = 32
+Dropout             = 0.0 (aucun)
+Positional Encoding = zeros initialise, appris pendant l'entrainement
+Fonction de perte   = CrossEntropyLoss
+
+FAIBLESSES IDENTIFIEES
+
+1. Positional Encoding initialise a zero
+   Le modele ne sait pas dans quel ordre sont les mots au debut.
+   Il doit tout apprendre depuis zero, ce qui est difficile.
+
+2. Pas de dropout
+   Avec seulement 9 000 phrases d'entrainement, le modele risque
+   de memoriser les donnees au lieu de generaliser.
+
+3. dim_feedforward = 1024
+   La convention standard est 4 x d_model = 4 x 512 = 2048.
+   Ici les couches internes ont deux fois moins de capacite.
+
+4. Seulement 10 epoques
+   Le modele n'a pas eu assez de temps pour apprendre correctement.

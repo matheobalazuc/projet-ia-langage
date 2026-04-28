@@ -1,0 +1,64 @@
+﻿
+
+PARAMETRES
+----------
+d_model             = 512          (inchange)
+nhead               = 8            (inchange)
+num_encoder_layers  = 6            (inchange)
+num_decoder_layers  = 6            (inchange)
+dim_feedforward     = 2048         (MODIFIE : etait 1024)
+n_epoch             = 20           (MODIFIE : etait 10)
+learning_rate       = 1e-4         (inchange)
+batch_size          = 32           (inchange)
+Dropout             = 0.1          (MODIFIE : etait 0.0)
+Positional Encoding = sinusoidal   (MODIFIE : etait zeros)
+Fonction de perte   = CrossEntropyLoss (inchange)
+
+MODIFICATIONS ET JUSTIFICATIONS
+
+
+1. Positional Encoding : zeros -> sinusoidal fixe
+
+   POURQUOI :
+   Le baseline utilise un PE initialise a zero, ce qui signifie
+   que le modele ne distingue pas la position des mots au debut
+   de l'entrainement.
+
+   Le PE sinusoidal injecte une information positionnelle
+   exploitable des la premiere epoque, sans apprentissage
+   necessaire. Chaque position recoit un vecteur unique base
+   sur des fonctions sin/cos a differentes frequences.
+
+   REFERENCE TP4 :
+   Cellule PositionalEncoding du TP4 - RNNs & Transformers :
+   "The Transformer requires positional embeddings in order to
+   understand the position of the element in the sequence."
+   "Here, we use sine and cosine functions of different frequencies."
+   Le code exact du TP4 a ete reutilise pour implementer ce PE.
+
+
+2. dim_feedforward : 1024 -> 2048
+   POURQUOI :
+   Convention standard = 4 x d_model = 4 x 512 = 2048.
+   A 1024, les couches internes ont deux fois moins de capacite
+   pour stocker les associations semantiques apprises.
+
+
+
+3. Dropout : 0.0 -> 0.1
+
+   POURQUOI :
+   Avec 9 000 phrases et un gros modele, risque de surapprentissage.
+   Le dropout force le modele a generaliser.
+
+
+4. n_epoch : 10 -> 20
+   POURQUOI :
+   Avec les nouvelles modifications, le modele a besoin de plus
+   de temps pour converger.
+
+SCORE BLEU (test)
+BLEU = 68.61
+
+
+

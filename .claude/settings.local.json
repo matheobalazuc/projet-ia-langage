@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import json; nb = json.load\\(open\\('c:/Users/Lenovo/Desktop/Eco/EcoCellulaire/projet-ia-langage/Exam_25_26_fr.ipynb'\\)\\); cells = nb['cells']; print\\(f'Nombre de cellules: {len\\(cells\\)}'\\); [print\\(f\\\\\"Cell {i} id={c.get\\('id','?'\\)} type={c['cell_type']} source={repr\\(c['source'][:80]\\)}\\\\\"\\) for i, c in enumerate\\(cells\\)]\")"
+    ]
+  }
+}
