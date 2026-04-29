@@ -15,9 +15,6 @@ Positional Encoding = sinusoidal   (MODIFIE : etait zeros)
 
 SCORE BLEU (test) = 46.13
 
-================================================================
-SPEECH
-================================================================
 
 Pour notre premiere configuration, nous avons conserve la
 taille du modele de base : 512 dimensions, 8 tetes d'attention,
@@ -25,7 +22,7 @@ et 6 couches encodeur et 6 couches decodeur.
 
 Nous avons cependant apporte quatre modifications cles.
 
----
+
 
 PREMIERE MODIFICATION : le Positional Encoding.
 
@@ -49,7 +46,6 @@ embeddings in order to understand the position of the element
 in the sequence", et "we use sine and cosine functions of
 different frequencies". Nous avons reutilise ce code tel quel.
 
----
 
 DEUXIEME MODIFICATION : le dim_feedforward.
 
@@ -61,7 +57,7 @@ semantiques apprises par le modele. En les laissant a 1024,
 on divisait par deux leur capacite de representation.
 Nous avons donc corrige ce parametre en le portant a 2048.
 
----
+
 
 TROISIEME MODIFICATION : le dropout.
 
@@ -73,7 +69,7 @@ Le dropout desactive aleatoirement 10% des neurones a chaque
 etape, ce qui force le modele a apprendre des representations
 plus robustes et generalisables.
 
----
+
 
 QUATRIEME MODIFICATION : le nombre d'epoques.
 
@@ -82,24 +78,4 @@ modifications architecturales introduisent plus de parametres
 et de regularisation, ce qui necessite plus d'iterations pour
 que le modele converge correctement.
 
----
 
-RESULTATS
-
-Cette configuration a obtenu un score BLEU de 46.13 sur
-l'ensemble de test, contre un score de depart tres faible
-pour le baseline.
-
-Ce resultat est significatif car il montre que des choix
-architecturaux motives, tires directement des bonnes pratiques
-enseignees en cours et en TP, permettent d'ameliorer
-considerablement les performances d'un modele entraine
-from scratch sur seulement 9 000 phrases.
-
-A titre de comparaison, le modele T5-Small pre-entraine
-de HuggingFace obtient un score BLEU de 60.55 sur le meme
-ensemble de test. L'ecart s'explique par le fait que T5 a
-ete pre-entraine sur le corpus C4, qui contient 156 milliards
-de tokens, contre 9 000 phrases pour notre modele.
-
-================================================================
