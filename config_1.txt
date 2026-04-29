@@ -1,64 +1,105 @@
-﻿
+﻿================================================================
+CONFIG 1 - SPEECH DE PRESENTATION
+================================================================
 
-PARAMETRES
-----------
+PARAMETRES MODIFIES
+
 d_model             = 512          (inchange)
 nhead               = 8            (inchange)
 num_encoder_layers  = 6            (inchange)
 num_decoder_layers  = 6            (inchange)
 dim_feedforward     = 2048         (MODIFIE : etait 1024)
 n_epoch             = 20           (MODIFIE : etait 10)
-learning_rate       = 1e-4         (inchange)
-batch_size          = 32           (inchange)
 Dropout             = 0.1          (MODIFIE : etait 0.0)
 Positional Encoding = sinusoidal   (MODIFIE : etait zeros)
-Fonction de perte   = CrossEntropyLoss (inchange)
 
-MODIFICATIONS ET JUSTIFICATIONS
+SCORE BLEU (test) = 46.13
 
+================================================================
+SPEECH
+================================================================
 
-1. Positional Encoding : zeros -> sinusoidal fixe
+Pour notre premiere configuration, nous avons conserve la
+taille du modele de base : 512 dimensions, 8 tetes d'attention,
+et 6 couches encodeur et 6 couches decodeur.
 
-   POURQUOI :
-   Le baseline utilise un PE initialise a zero, ce qui signifie
-   que le modele ne distingue pas la position des mots au debut
-   de l'entrainement.
+Nous avons cependant apporte quatre modifications cles.
 
-   Le PE sinusoidal injecte une information positionnelle
-   exploitable des la premiere epoque, sans apprentissage
-   necessaire. Chaque position recoit un vecteur unique base
-   sur des fonctions sin/cos a differentes frequences.
+---
 
-   REFERENCE TP4 :
-   Cellule PositionalEncoding du TP4 - RNNs & Transformers :
-   "The Transformer requires positional embeddings in order to
-   understand the position of the element in the sequence."
-   "Here, we use sine and cosine functions of different frequencies."
-   Le code exact du TP4 a ete reutilise pour implementer ce PE.
+PREMIERE MODIFICATION : le Positional Encoding.
 
+Dans la configuration de base, le positional encoding etait
+initialise a zero. Cela signifie qu'au debut de l'entrainement,
+le modele ne fait aucune difference entre les positions des mots
+dans la phrase. Il doit apprendre cette information depuis zero,
+ce qui ralentit considerablement la convergence.
 
-2. dim_feedforward : 1024 -> 2048
-   POURQUOI :
-   Convention standard = 4 x d_model = 4 x 512 = 2048.
-   A 1024, les couches internes ont deux fois moins de capacite
-   pour stocker les associations semantiques apprises.
+Nous l'avons remplace par un encodage sinusoidal fixe, qui
+utilise des fonctions sinus et cosinus a differentes frequences
+pour attribuer un vecteur unique a chaque position.
+L'avantage est immediat : des la premiere epoque, le modele
+dispose d'une information positionnelle exploitable sans avoir
+besoin de l'apprendre.
 
+Cette approche est directement issue du TP4 du cours, dans
+lequel la classe PositionalEncoding est introduite avec la
+mention explicite : "The Transformer requires positional
+embeddings in order to understand the position of the element
+in the sequence", et "we use sine and cosine functions of
+different frequencies". Nous avons reutilise ce code tel quel.
 
+---
 
-3. Dropout : 0.0 -> 0.1
+DEUXIEME MODIFICATION : le dim_feedforward.
 
-   POURQUOI :
-   Avec 9 000 phrases et un gros modele, risque de surapprentissage.
-   Le dropout force le modele a generaliser.
+Dans le baseline, dim_feedforward valait 1024. Or, la convention
+standard du Transformer original est que cette valeur doit etre
+egale a 4 fois d_model, soit 4 x 512 = 2048. Les couches
+feed-forward sont celles qui stockent les associations
+semantiques apprises par le modele. En les laissant a 1024,
+on divisait par deux leur capacite de representation.
+Nous avons donc corrige ce parametre en le portant a 2048.
 
+---
 
-4. n_epoch : 10 -> 20
-   POURQUOI :
-   Avec les nouvelles modifications, le modele a besoin de plus
-   de temps pour converger.
+TROISIEME MODIFICATION : le dropout.
 
-SCORE BLEU (test)
-BLEU = 68.61
+Le modele de base ne comportait aucun dropout. Avec seulement
+9 000 phrases d'entrainement et un modele de plusieurs millions
+de parametres, le risque de surapprentissage est eleve : le
+modele peut memoriser les donnees plutot que de generaliser.
+Le dropout desactive aleatoirement 10% des neurones a chaque
+etape, ce qui force le modele a apprendre des representations
+plus robustes et generalisables.
 
+---
 
+QUATRIEME MODIFICATION : le nombre d'epoques.
 
+Nous avons augmente le nombre d'epoques de 10 a 20. Ces trois
+modifications architecturales introduisent plus de parametres
+et de regularisation, ce qui necessite plus d'iterations pour
+que le modele converge correctement.
+
+---
+
+RESULTATS
+
+Cette configuration a obtenu un score BLEU de 46.13 sur
+l'ensemble de test, contre un score de depart tres faible
+pour le baseline.
+
+Ce resultat est significatif car il montre que des choix
+architecturaux motives, tires directement des bonnes pratiques
+enseignees en cours et en TP, permettent d'ameliorer
+considerablement les performances d'un modele entraine
+from scratch sur seulement 9 000 phrases.
+
+A titre de comparaison, le modele T5-Small pre-entraine
+de HuggingFace obtient un score BLEU de 60.55 sur le meme
+ensemble de test. L'ecart s'explique par le fait que T5 a
+ete pre-entraine sur le corpus C4, qui contient 156 milliards
+de tokens, contre 9 000 phrases pour notre modele.
+
+================================================================
